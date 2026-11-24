@@ -4,24 +4,27 @@ export default {
   theme: {
     extend: {
       colors: {
+        // 깊은 올리브 잉크 — 본문 글자·버튼 바탕
         ink: {
-          DEFAULT: '#1C2541',
-          soft: '#3B4869',
-          mute: '#6B7690',
+          DEFAULT: '#26331F',
+          soft: '#47533D',
+          mute: '#7C8674',
         },
+        // 주 색 — 스팟맵풍 올리브 그린
         gold: {
-          DEFAULT: '#B9962F',
-          soft: '#F6EED9',
-          line: '#E7D8AE',
+          DEFAULT: '#6F8B3E',
+          deep: '#5A7231',
+          soft: '#EDF1DF',
+          line: '#CCD8B2',
         },
         paper: {
-          DEFAULT: '#FAF7F1',
-          deep: '#F2ECE1',
+          DEFAULT: '#FAF8F1',
+          deep: '#F1EEE1',
         },
         line: {
-          DEFAULT: '#E7DFD1',
+          DEFAULT: '#E3E0D0',
         },
-        rose: '#B4513E',
+        rose: '#BF4A33',
       },
       fontFamily: {
         sans: [
@@ -36,9 +39,10 @@ export default {
         ],
       },
       boxShadow: {
-        soft: '0 10px 30px -18px rgba(28, 37, 65, 0.45)',
-        card: '0 4px 14px -8px rgba(28, 37, 65, 0.28)',
-        sheet: '0 -10px 30px -18px rgba(28, 37, 65, 0.45)',
+        soft: '0 10px 30px -18px rgba(38, 51, 31, 0.5)',
+        card: '0 4px 14px -8px rgba(38, 51, 31, 0.3)',
+        sheet: '0 -10px 30px -18px rgba(38, 51, 31, 0.45)',
+        float: '0 6px 18px -8px rgba(38, 51, 31, 0.45)',
       },
       keyframes: {
         fadein: {
@@ -57,7 +61,7 @@ export default {
       animation: {
         fadein: 'fadein 0.22s ease-out',
         pop: 'pop 0.16s ease-out',
-        slideup: 'slideup 0.22s ease-out',
+        slideup: 'slideup 0.24s cubic-bezier(0.22, 0.61, 0.36, 1)',
       },
     },
   },

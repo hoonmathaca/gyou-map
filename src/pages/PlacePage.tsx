@@ -1,9 +1,12 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'
+import KakaoMap from '../components/KakaoMap'
 import StarRating from '../components/StarRating'
 import { Sticker, placeTitle } from '../components/PlaceCard'
+import { Icon, CatIcon } from '../components/icons'
 import { REPORT_REASONS, categoryOf } from '../lib/categories'
 import { createReview, fetchPlace, fetchReviews, reportPlace } from '../lib/api'
+import { copyText, directionsUrl, mapUrl } from '../lib/geo'
 import type { Place, Review } from '../lib/types'
 import { deviceKey, rememberNickname, savedNickname } from '../lib/deviceKey'
 
@@ -16,6 +19,8 @@ export default function PlacePage() {
   const [reviews, setReviews] = useState<Review[]>([])
   const [loading, setLoading] = useState(true)
   const [missing, setMissing] = useState(false)
+  const [photoOpen, setPhotoOpen] = useState(false)
+  const [copied, setCopied] = useState(false)
 
   const [reportOpen, setReportOpen] = useState(false)
   const [reportReason, setReportReason] = useState<string>(REPORT_REASONS[0])
@@ -88,6 +93,13 @@ export default function PlacePage() {
 
   const cat = categoryOf(place.category)
   const avg = reviews.length ? reviews.reduce((s, r) => s + r.rating, 0) / reviews.length : 0
+  const fullAddress = `${place.address}${place.address_detail ? ` ${place.address_detail}` : ''}`
+
+  async function onCopy() {
+    const ok = await copyText(fullAddress)
+    setCopied(ok)
+    window.setTimeout(() => setCopied(false), 2000)
+  }
 
   async function submitReport() {
     if (!place) return
@@ -143,85 +155,134 @@ export default function PlacePage() {
   }
 
   return (
-    <div className="screen pb-28">
-      <TopBar />
+    <div className="screen bg-paper pb-24">
+      <TopBar title={place.name} />
 
       {justAdded ? (
-        <div className="mx-4 mt-2.5 flex items-center gap-2 rounded-2xl border border-gold-line bg-gold-soft px-3.5 py-2.5 text-[12.5px] font-bold text-ink">
-          <span aria-hidden>🎉</span>
+        <div className="mx-4 mt-2.5 flex items-center gap-2 rounded-2xl border border-gold-line bg-gold-soft px-3.5 py-2.5 text-[12.5px] font-bold text-gold-deep">
+          <Icon name="check" className="h-4 w-4" />
           <span className="flex-1">등록 완료! 지도에 바로 표시됩니다.</span>
-          <button type="button" aria-label="알림 닫기" onClick={() => setJustAdded(false)} className="text-ink-mute">
-            ✕
+          <button type="button" aria-label="알림 닫기" onClick={() => setJustAdded(false)}>
+            <Icon name="close" className="h-3.5 w-3.5" />
           </button>
         </div>
       ) : null}
 
       <main className="flex-1">
-        <div className="bg-paper-deep px-4 pb-4 pt-3">
-          <Sticker
-            url={place.sticker_url}
-            name={place.name}
-            className="aspect-[4/3] w-full !rounded-3xl object-cover shadow-soft"
-          />
-          <div className="mt-3 flex items-start justify-between gap-2">
-            <div className="min-w-0">
-              <span className="rounded-full bg-gold-soft px-2 py-0.5 text-[11px] font-bold text-gold">
-                {cat.glyph} {cat.label}
-              </span>
-              <h1 className="mt-1.5 text-[21px] font-extrabold leading-tight">{placeTitle(place)}</h1>
-              <p className="mt-1 text-[13px] leading-snug text-ink-soft">
-                {place.address}
-                {place.address_detail ? ` ${place.address_detail}` : ''}
-              </p>
-            </div>
-          </div>
-
-          <div className="mt-2.5 flex items-center gap-2 text-[12.5px] text-ink-mute">
-            <StarRating value={avg} size={14} />
-            <span>{reviews.length ? `${avg.toFixed(1)} · 리뷰 ${reviews.length}` : '아직 리뷰가 없어요'}</span>
-            <span className="ml-auto rounded-full bg-white px-2 py-0.5 text-[11px] font-bold text-ink-soft">
+        {/* ── 이름·주소 ─────────────────────────────── */}
+        <section className="px-4 pt-4">
+          <div className="flex items-center gap-2">
+            <span className="inline-flex items-center gap-1 rounded-full bg-gold-soft px-2.5 py-1 text-[11px] font-extrabold text-gold-deep">
+              <CatIcon id={place.category} className="h-3.5 w-3.5" />
+              {cat.label}
+            </span>
+            <span className="rounded-full bg-white px-2.5 py-1 text-[10.5px] font-bold text-ink-mute ring-1 ring-line">
               {place.registrant_type === 'owner' ? '사장님 등록' : '교우 제보'}
             </span>
           </div>
 
+          <h1 className="mt-2.5 text-[23px] font-extrabold leading-tight tracking-tight text-ink">
+            {place.name}
+            {place.baptismal_name ? (
+              <span className="ml-1.5 text-[16px] font-bold text-gold-deep">({place.baptismal_name})</span>
+            ) : null}
+          </h1>
+
+          <div className="mt-2 flex items-start gap-2">
+            <p className="min-w-0 flex-1 text-[13px] leading-snug text-ink-soft">{fullAddress}</p>
+            <button
+              type="button"
+              onClick={onCopy}
+              aria-label="주소 복사"
+              className="flex h-7 shrink-0 items-center gap-1 rounded-full border border-line bg-white px-2.5 text-[11px] font-bold text-ink-soft active:scale-95"
+            >
+              <Icon name={copied ? 'check' : 'copy'} className="h-3.5 w-3.5" />
+              {copied ? '복사됨' : '복사'}
+            </button>
+          </div>
+
+          <div className="mt-2 flex items-center gap-1.5 text-[12px] text-ink-mute">
+            <StarRating value={avg} size={13} />
+            <span>
+              {reviews.length ? `${avg.toFixed(1)} · 리뷰 ${reviews.length}` : '아직 리뷰가 없어요'}
+            </span>
+          </div>
+
           {place.intro ? (
-            <p className="mt-3 rounded-2xl bg-white p-3.5 text-[13.5px] leading-relaxed text-ink-soft">
+            <p className="mt-3 rounded-2xl border border-line bg-white px-3.5 py-3 text-[13px] leading-relaxed text-ink-soft">
               {place.intro}
             </p>
           ) : null}
+        </section>
 
-          <div className="mt-3 flex gap-2">
+        {/* ── 미니 지도 ─────────────────────────────── */}
+        <section className="mt-3 px-4">
+          <div className="relative overflow-hidden rounded-3xl border border-line bg-paper-deep">
+            <KakaoMap
+              className="h-[152px] w-full"
+              points={[
+                {
+                  id: place.id,
+                  lat: place.lat,
+                  lng: place.lng,
+                  name: place.name,
+                  baptismal: place.baptismal_name,
+                  category: place.category,
+                  active: true,
+                },
+              ]}
+              level={4}
+              interactive={false}
+              padding={40}
+            />
             <a
-              href={`https://map.kakao.com/link/to/${encodeURIComponent(place.name)},${place.lat},${place.lng}`}
+              href={directionsUrl(placeTitle(place), place.lat, place.lng)}
               target="_blank"
               rel="noreferrer"
-              className="btn-ghost flex-1 !py-2.5 !text-[13px]"
+              className="absolute left-2.5 top-2.5 flex items-center gap-1.5 rounded-full border border-line bg-white/95 px-3 py-1.5 text-[12px] font-extrabold text-gold-deep shadow-card"
             >
-              🧭 길찾기
+              길찾기
+              <Icon name="arrow" className="h-3.5 w-3.5" />
             </a>
-            <button
-              type="button"
-              onClick={() => {
-                setReportOpen(true)
-                setReportState('idle')
-                setReportError('')
-              }}
-              className="btn-ghost flex-1 !border-rose/30 !py-2.5 !text-[13px] !text-rose"
+            <a
+              href={mapUrl(placeTitle(place), place.lat, place.lng)}
+              target="_blank"
+              rel="noreferrer"
+              aria-label="카카오맵에서 크게 보기"
+              className="absolute right-2.5 top-2.5 flex h-8 w-8 items-center justify-center rounded-full border border-line bg-white/95 text-ink-soft shadow-card"
             >
-              사실과 달라요
+              <Icon name="arrow" className="h-4 w-4" />
+            </a>
+          </div>
+        </section>
+
+        {/* ── 교우의 집 스티커 ─────────────────────── */}
+        <section className="mt-4 px-4">
+          <div className="flex items-center justify-between">
+            <h2 className="text-[13px] font-extrabold text-ink">교우의 집 스티커</h2>
+            <button type="button" onClick={() => setPhotoOpen(true)} className="text-[11.5px] font-bold text-gold-deep">
+              크게 보기 ›
             </button>
           </div>
-        </div>
+          <button type="button" onClick={() => setPhotoOpen(true)} className="mt-2 block w-full">
+            <Sticker
+              url={place.sticker_url}
+              name={place.name}
+              className="aspect-[4/3] w-full !rounded-3xl object-cover shadow-soft"
+            />
+          </button>
+        </section>
 
-        <section className="px-4 pt-5">
+        {/* ── 리뷰 ───────────────────────────────────── */}
+        <section className="mt-5 px-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-[15px] font-extrabold">
+            <h2 className="text-[15px] font-extrabold text-ink">
               교우 리뷰 <span className="text-gold">{reviews.length}</span>
             </h2>
             <button
               type="button"
               onClick={() => setReviewOpen((v) => !v)}
-              className="rounded-full border border-line bg-white px-3 py-1.5 text-[12px] font-bold text-ink-soft"
+              className="rounded-full border border-gold-line bg-white px-3 py-1.5 text-[12px] font-extrabold text-gold-deep"
             >
               {reviewOpen ? '닫기' : '리뷰 쓰기'}
             </button>
@@ -265,11 +326,11 @@ export default function PlacePage() {
             </div>
           ) : null}
 
-          <ul className="mt-3 space-y-2.5 pb-4">
+          <ul className="mt-3 space-y-2.5">
             {reviews.map((r) => (
               <li key={r.id} className="card p-3.5">
                 <div className="flex items-center gap-2">
-                  <span className="text-[13px] font-bold">
+                  <span className="text-[13px] font-extrabold">
                     {r.nickname}
                     {r.baptismal_name ? `(${r.baptismal_name})` : ''}
                   </span>
@@ -283,17 +344,52 @@ export default function PlacePage() {
               <li className="py-8 text-center text-[13px] text-ink-mute">첫 리뷰를 남겨 보세요.</li>
             ) : null}
           </ul>
+
+          <div className="mt-4 pb-2 text-center">
+            <button
+              type="button"
+              onClick={() => {
+                setReportOpen(true)
+                setReportState('idle')
+                setReportError('')
+              }}
+              className="inline-flex items-center gap-1.5 rounded-full px-3 py-2 text-[11.5px] font-bold text-ink-mute underline decoration-line underline-offset-2"
+            >
+              <Icon name="flag" className="h-3.5 w-3.5" />
+              사실과 달라요
+            </button>
+          </div>
         </section>
       </main>
 
-      {reportOpen ? (
-        <div className="fixed inset-0 z-[900] flex items-end justify-center">
+      {/* 스티커 크게 보기 */}
+      {photoOpen ? (
+        <div className="fixed inset-0 z-[800] flex flex-col bg-ink/95 px-3 py-4">
           <button
             type="button"
+            onClick={() => setPhotoOpen(false)}
             aria-label="닫기"
-            className="dim absolute inset-0"
-            onClick={() => setReportOpen(false)}
-          />
+            className="ml-auto flex h-9 w-9 items-center justify-center rounded-full bg-white/15 text-paper"
+          >
+            <Icon name="close" className="h-5 w-5" />
+          </button>
+          <div className="flex flex-1 items-center justify-center">
+            <img
+              src={place.sticker_url}
+              alt={`${place.name} 교우의 집 스티커`}
+              className="max-h-full max-w-full rounded-2xl object-contain"
+            />
+          </div>
+          <p className="mt-3 text-center text-[12px] text-paper/80">
+            {placeTitle(place)} · 교우의 집 스티커
+          </p>
+        </div>
+      ) : null}
+
+      {/* 신고 모달 */}
+      {reportOpen ? (
+        <div className="fixed inset-0 z-[900] flex items-end justify-center">
+          <button type="button" aria-label="닫기" className="dim absolute inset-0" onClick={() => setReportOpen(false)} />
           <div className="relative w-full max-w-md animate-slideup rounded-t-3xl bg-paper px-4 pb-[calc(env(safe-area-inset-bottom)+16px)] pt-4">
             <div className="mx-auto mb-3 h-1 w-10 rounded-full bg-line" />
             {reportState === 'done' || reportState === 'already' ? (
@@ -313,7 +409,7 @@ export default function PlacePage() {
             ) : (
               <>
                 <h2 className="text-[16px] font-extrabold">사실과 달라요</h2>
-                <p className="mt-1 text-[12.5px] text-ink-mute">
+                <p className="mt-1 text-[12.5px] leading-relaxed text-ink-mute">
                   다른 교우들이 헛걸음하지 않도록 알려 주세요. 서로 다른 교우 3명이 신고하면 자동으로 숨겨져요.
                 </p>
                 <div className="mt-3 space-y-1.5">
@@ -321,7 +417,7 @@ export default function PlacePage() {
                     <label
                       key={reason}
                       className={`flex cursor-pointer items-center gap-2.5 rounded-2xl border px-3.5 py-3 text-[13.5px] ${
-                        reportReason === reason ? 'border-gold bg-gold-soft/60' : 'border-line bg-white'
+                        reportReason === reason ? 'border-gold bg-gold-soft/70' : 'border-line bg-white'
                       }`}
                     >
                       <input
@@ -367,19 +463,19 @@ export default function PlacePage() {
   )
 }
 
-function TopBar() {
+function TopBar({ title }: { title?: string }) {
   const navigate = useNavigate()
   return (
-    <header className="sticky top-0 z-30 flex items-center gap-2 border-b border-line bg-paper/95 px-3 pb-2.5 pt-[max(env(safe-area-inset-top),10px)] backdrop-blur">
+    <header className="sticky top-0 z-30 flex items-center gap-2 border-b border-line/70 bg-paper/95 px-3 pb-2.5 pt-[max(env(safe-area-inset-top),10px)] backdrop-blur">
       <button
         type="button"
         onClick={() => (window.history.length > 1 ? navigate(-1) : navigate('/'))}
         aria-label="뒤로"
-        className="flex h-9 w-9 items-center justify-center rounded-full bg-white text-[15px] shadow-card"
+        className="flex h-9 w-9 items-center justify-center rounded-full border border-line bg-white text-ink shadow-card"
       >
-        ←
+        <Icon name="back" className="h-4.5 w-4.5" />
       </button>
-      <span className="text-[14px] font-extrabold">교우의 집</span>
+      <span className="truncate text-[13.5px] font-extrabold">{title ?? '교우의 집'}</span>
       <Link to="/" className="ml-auto text-[12px] font-bold text-ink-mute">
         지도
       </Link>

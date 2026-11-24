@@ -1,32 +1,31 @@
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import MapView from '../components/MapView'
+import KakaoMap from '../components/KakaoMap'
+import { CatIcon, Icon } from '../components/icons'
 import { CATEGORIES, categoryOf } from '../lib/categories'
 import { createPlace, uploadSticker } from '../lib/api'
-import { geocodeAddress } from '../lib/geocode'
+import { loadKakao } from '../lib/kakao'
 import { shrinkImage } from '../lib/image'
 import type { RegistrantType } from '../lib/types'
 
-/** 다음 우편번호 서비스 — 키 없이 쓰는 주소검색 (2026-11-30 t1.daumcdn.net 종료로 kakaocdn 사용) */
+/** 다음 우편번호 서비스 — 키 없이 쓰는 주소검색 */
 const DAUM_SCRIPT = 'https://t1.kakaocdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js'
 
 interface DaumResult {
   roadAddress: string
   jibunAddress: string
   buildingName: string
-  bname: string
   apartment: string
 }
 
-declare global {
-  interface Window {
-    daum?: {
-      Postcode: new (options: { oncomplete: (data: DaumResult) => void; width?: string; height?: string }) => {
-        open: (options?: { popupTitle?: string }) => void
-        embed: (element: HTMLElement) => void
-      }
-    }
-  }
+interface FoundPlace {
+  id: string
+  name: string
+  category: string
+  address: string
+  roadAddress: string
+  lat: number
+  lng: number
 }
 
 let daumLoading: Promise<void> | null = null
@@ -44,6 +43,24 @@ function loadDaum(): Promise<void> {
   return daumLoading
 }
 
+/** 카카오 장소 검색 결과의 업종 → 우리 업종 */
+function guessCategory(name: string, categoryName: string, groupCode: string): string {
+  const text = `${name} ${categoryName}`
+  const has = (...words: string[]) => words.some((w) => text.includes(w))
+  if (groupCode === 'CE7' || has('카페', '커피', '디저트')) return 'cafe'
+  if (has('베이커리', '제과', '빵', '케이크')) return 'bakery'
+  if (groupCode === 'FD6' || has('음식점', '식당', '국밥', '분식', '고기')) return 'restaurant'
+  if (has('꽃', '화훼', '플라워')) return 'flower'
+  if (has('미용', '헤어', '네일', '피부', '뷰티')) return 'beauty'
+  if (groupCode === 'PM9' || groupCode === 'HP8' || has('병원', '약국', '의원', '한의원')) return 'health'
+  if (groupCode === 'CS2' || groupCode === 'MT1' || has('마트', '편의점', '식료품', '청과')) return 'grocery'
+  if (has('학원', '교육', '교습', '독서실')) return 'edu'
+  if (has('의류', '패션', '잡화', '신발', '가방')) return 'shop'
+  if (has('부동산', '세탁', '수리', '철물')) return 'service'
+  if (has('사진', '인쇄', '복사')) return 'photo'
+  return 'etc'
+}
+
 export default function AddPage() {
   const navigate = useNavigate()
   const [registrant, setRegistrant] = useState<RegistrantType>('owner')
@@ -54,9 +71,11 @@ export default function AddPage() {
   const [addressDetail, setAddressDetail] = useState('')
   const [intro, setIntro] = useState('')
   const [draft, setDraft] = useState<{ lat: number; lng: number } | null>(null)
-  const [center, setCenter] = useState<[number, number]>([37.5665, 126.978])
-  const [zoom, setZoom] = useState(12)
-  const [geoState, setGeoState] = useState<'idle' | 'finding' | 'ok' | 'fail'>('idle')
+  const [center, setCenter] = useState<{ lat: number; lng: number } | null>(null)
+  const [keyword, setKeyword] = useState('')
+  const [results, setResults] = useState<FoundPlace[]>([])
+  const [searching, setSearching] = useState(false)
+  const [searched, setSearched] = useState(false)
   const [photo, setPhoto] = useState<{ file: File; preview: string } | null>(null)
   const [sending, setSending] = useState(false)
   const [error, setError] = useState('')
@@ -68,6 +87,62 @@ export default function AddPage() {
     }
   }, [photo])
 
+  /** 카카오 장소 검색 — 가게 이름·주소로 찾아 좌표까지 채운다 */
+  async function searchPlaces() {
+    const q = keyword.trim()
+    if (!q) return
+    setError('')
+    setSearching(true)
+    setSearched(false)
+    try {
+      await loadKakao()
+      const services = window.kakao.maps.services
+      const ps = new services.Places()
+      const found = await new Promise<FoundPlace[]>((resolve) => {
+        ps.keywordSearch(
+          q,
+          (data: any[], status: string) => {
+            if (status !== services.Status.OK) {
+              resolve([])
+              return
+            }
+            resolve(
+              data.map((d) => ({
+                id: String(d.id),
+                name: d.place_name as string,
+                category: guessCategory(d.place_name, d.category_name ?? '', d.category_group_code ?? ''),
+                address: (d.road_address_name || d.address_name) as string,
+                roadAddress: (d.address_name || '') as string,
+                lat: Number(d.y),
+                lng: Number(d.x),
+              })),
+            )
+          },
+          { size: 10 },
+        )
+      })
+      setResults(found)
+      setSearched(true)
+      if (found.length === 0) setError('검색 결과가 없어요. 주소로 직접 찾아 주세요.')
+    } catch (e) {
+      setError((e as Error).message)
+    } finally {
+      setSearching(false)
+    }
+  }
+
+  function pickFound(item: FoundPlace) {
+    setName(item.name.slice(0, 40))
+    if (item.address) setAddress(item.address.slice(0, 200))
+    if (!CATEGORIES.some((c) => c.id === category) || category === 'cafe') setCategory(item.category)
+    setDraft({ lat: item.lat, lng: item.lng })
+    setCenter({ lat: item.lat, lng: item.lng })
+    setResults([])
+    setSearched(false)
+    setKeyword(item.name)
+  }
+
+  /** 다음 우편번호 → 카카오 지오코딩 */
   async function pickAddress() {
     setError('')
     try {
@@ -75,20 +150,25 @@ export default function AddPage() {
       const Postcode = window.daum?.Postcode
       if (!Postcode) throw new Error('주소검색을 불러오지 못했어요.')
       new Postcode({
-        oncomplete: async (data) => {
+        oncomplete: async (data: DaumResult) => {
           const base = data.roadAddress || data.jibunAddress
           setAddress(base)
           if (data.buildingName && data.apartment === 'Y') setAddressDetail(data.buildingName)
-          setGeoState('finding')
-          const coords = await geocodeAddress(base)
-          if (coords) {
-            setDraft(coords)
-            setCenter([coords.lat, coords.lng])
-            setZoom(16)
-            setGeoState('ok')
-          } else {
-            setGeoState('fail')
-            setZoom(14)
+          try {
+            await loadKakao()
+            const geocoder = new window.kakao.maps.services.Geocoder()
+            geocoder.addressSearch(base, (result: any[], status: string) => {
+              const first = result?.[0]
+              if (status === window.kakao.maps.services.Status.OK && first) {
+                const next = { lat: Number(first.y), lng: Number(first.x) }
+                setDraft(next)
+                setCenter(next)
+              } else {
+                setError('주소의 좌표를 찾지 못했어요. 지도를 눌러 위치를 지정해 주세요.')
+              }
+            })
+          } catch (e) {
+            setError((e as Error).message)
           }
         },
         width: '100%',
@@ -141,57 +221,131 @@ export default function AddPage() {
   }
 
   return (
-    <div className="screen pb-6">
-      <header className="sticky top-0 z-30 flex items-center gap-2 border-b border-line bg-paper/95 px-3 pb-2.5 pt-[max(env(safe-area-inset-top),10px)] backdrop-blur">
+    <div className="screen bg-paper pb-8">
+      <header className="sticky top-0 z-30 flex items-center gap-2 border-b border-line/70 bg-paper/95 px-3 pb-2.5 pt-[max(env(safe-area-inset-top),10px)] backdrop-blur">
         <button
           type="button"
           onClick={() => (window.history.length > 1 ? navigate(-1) : navigate('/'))}
           aria-label="뒤로"
-          className="flex h-9 w-9 items-center justify-center rounded-full bg-white text-[15px] shadow-card"
+          className="flex h-9 w-9 items-center justify-center rounded-full border border-line bg-white text-ink shadow-card"
         >
-          ←
+          <Icon name="back" className="h-4.5 w-4.5" />
         </button>
         <div>
           <h1 className="text-[15px] font-extrabold leading-tight">교우의 집 등록</h1>
-          <p className="text-[11.5px] text-ink-mute">30초면 충분해요</p>
+          <p className="text-[11px] leading-tight text-ink-mute">1분이면 충분해요</p>
         </div>
       </header>
 
-      <main className="flex-1 space-y-4 px-4 pt-4">
+      <main className="flex-1 space-y-5 px-4 pt-4">
+        {/* 누가 등록하나요 */}
         <section>
           <span className="label">누가 등록하나요?</span>
           <div className="grid grid-cols-2 gap-2">
             <button
               type="button"
               onClick={() => setRegistrant('owner')}
-              className={`rounded-2xl border px-3 py-3 text-left ${
-                registrant === 'owner' ? 'border-ink bg-ink text-paper' : 'border-line bg-white'
+              className={`rounded-2xl border px-3 py-2.5 text-left transition ${
+                registrant === 'owner'
+                  ? 'border-gold bg-gold text-white shadow-card'
+                  : 'border-line bg-white text-ink'
               }`}
             >
-              <span className="block text-[14px] font-extrabold">사장님 직접</span>
-              <span className={`text-[11.5px] ${registrant === 'owner' ? 'text-paper/70' : 'text-ink-mute'}`}>
+              <span className="block text-[13.5px] font-extrabold">사장님 직접</span>
+              <span className={`text-[11px] ${registrant === 'owner' ? 'text-white/75' : 'text-ink-mute'}`}>
                 우리 가게 등록
               </span>
             </button>
             <button
               type="button"
               onClick={() => setRegistrant('visitor')}
-              className={`rounded-2xl border px-3 py-3 text-left ${
-                registrant === 'visitor' ? 'border-ink bg-ink text-paper' : 'border-line bg-white'
+              className={`rounded-2xl border px-3 py-2.5 text-left transition ${
+                registrant === 'visitor'
+                  ? 'border-gold bg-gold text-white shadow-card'
+                  : 'border-line bg-white text-ink'
               }`}
             >
-              <span className="block text-[14px] font-extrabold">손님 제보</span>
-              <span className={`text-[11.5px] ${registrant === 'visitor' ? 'text-paper/70' : 'text-ink-mute'}`}>
+              <span className="block text-[13.5px] font-extrabold">손님 제보</span>
+              <span className={`text-[11px] ${registrant === 'visitor' ? 'text-white/75' : 'text-ink-mute'}`}>
                 다녀온 가게 알려주기
               </span>
             </button>
           </div>
         </section>
 
+        {/* 장소 검색 */}
+        <section>
+          <span className="label">장소 검색</span>
+          <div className="flex gap-2">
+            <div className="relative flex-1">
+              <Icon
+                name="search"
+                className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-mute"
+              />
+              <input
+                value={keyword}
+                onChange={(e) => setKeyword(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault()
+                    searchPlaces()
+                  }
+                }}
+                placeholder="가게 이름이나 주소로 검색"
+                className="field !pl-10 !text-[13.5px]"
+                aria-label="장소 검색"
+              />
+            </div>
+            <button
+              type="button"
+              onClick={searchPlaces}
+              disabled={searching}
+              className="btn-primary shrink-0 !rounded-2xl !px-4 !py-2.5 !text-[13px]"
+            >
+              {searching ? '찾는 중' : '검색'}
+            </button>
+          </div>
+
+          <button
+            type="button"
+            onClick={pickAddress}
+            className="mt-1.5 text-[11.5px] font-bold text-gold-deep underline decoration-gold-line underline-offset-2"
+          >
+            주소로 직접 찾기
+          </button>
+
+          {results.length > 0 ? (
+            <ul className="mt-2 divide-y divide-line overflow-hidden rounded-2xl border border-line bg-white">
+              {results.map((item) => (
+                <li key={item.id}>
+                  <button
+                    type="button"
+                    onClick={() => pickFound(item)}
+                    className="flex w-full items-start gap-2.5 px-3 py-2.5 text-left active:bg-gold-soft/50"
+                  >
+                    <Icon name="pin" className="mt-0.5 h-4 w-4 shrink-0 text-gold" />
+                    <span className="min-w-0 flex-1">
+                      <span className="block truncate text-[13px] font-extrabold">{item.name}</span>
+                      <span className="mt-0.5 block truncate text-[11.5px] text-ink-mute">{item.address}</span>
+                    </span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          ) : null}
+
+          {searched && results.length === 0 ? (
+            <p className="mt-2 text-[11.5px] leading-snug text-ink-mute">
+              검색 결과가 없어요. ‘주소로 직접 찾기’로 주소를 넣어 주세요.
+            </p>
+          ) : null}
+        </section>
+
+        {/* 이름 · 세례명 */}
         <section className="space-y-2.5">
           <div>
             <label htmlFor="name" className="label">
-              가게 이름 <span className="text-gold">*</span>
+              가게 이름 <span className="text-rose">*</span>
             </label>
             <input
               id="name"
@@ -204,7 +358,7 @@ export default function AddPage() {
           </div>
           <div>
             <label htmlFor="baptismal" className="label">
-              세례명 <span className="text-ink-mute">(선택)</span>
+              세례명 <span className="font-bold text-ink-mute">(선택)</span>
             </label>
             <input
               id="baptismal"
@@ -217,9 +371,10 @@ export default function AddPage() {
           </div>
         </section>
 
+        {/* 업종 */}
         <section>
           <span className="label">
-            업종 <span className="text-gold">*</span>
+            업종 <span className="text-rose">*</span>
           </span>
           <div className="grid grid-cols-3 gap-1.5">
             {CATEGORIES.map((c) => (
@@ -227,33 +382,31 @@ export default function AddPage() {
                 key={c.id}
                 type="button"
                 onClick={() => setCategory(c.id)}
-                className={`rounded-2xl border px-2 py-2.5 text-[12.5px] font-bold ${
-                  category === c.id ? 'border-gold bg-gold-soft text-ink' : 'border-line bg-white text-ink-soft'
+                className={`flex items-center justify-center gap-1 rounded-2xl border px-1.5 py-2.5 text-[12px] font-bold transition ${
+                  category === c.id
+                    ? 'border-gold bg-gold text-white'
+                    : 'border-line bg-white text-ink-soft'
                 }`}
               >
-                <span className="mr-1">{c.glyph}</span>
-                {c.label}
+                <CatIcon id={c.id} className="h-3.5 w-3.5 shrink-0" />
+                <span className="truncate">{c.label}</span>
               </button>
             ))}
           </div>
         </section>
 
+        {/* 주소 · 위치 */}
         <section>
           <span className="label">
-            주소 <span className="text-gold">*</span>
+            주소 <span className="text-rose">*</span>
           </span>
-          <div className="flex gap-2">
-            <input
-              value={address}
-              onChange={(e) => setAddress(e.target.value)}
-              placeholder="주소를 검색해 주세요"
-              className="field flex-1"
-              aria-label="주소"
-            />
-            <button type="button" onClick={pickAddress} className="btn-ghost shrink-0 !px-3 !py-2.5 !text-[13px]">
-              주소 찾기
-            </button>
-          </div>
+          <input
+            value={address}
+            onChange={(e) => setAddress(e.target.value)}
+            placeholder="주소를 검색해 주세요"
+            className="field"
+            aria-label="주소"
+          />
           <input
             value={addressDetail}
             onChange={(e) => setAddressDetail(e.target.value)}
@@ -263,41 +416,29 @@ export default function AddPage() {
             aria-label="상세 주소"
           />
 
-          <div className="mt-2 overflow-hidden rounded-3xl border border-line">
-            <div className="flex items-center justify-between bg-white px-3 py-2 text-[11.5px] text-ink-mute">
+          <div className="mt-2 overflow-hidden rounded-3xl border border-line bg-white">
+            <div className="flex items-center justify-between px-3 py-2 text-[11px] text-ink-mute">
               <span>
-                {geoState === 'finding'
-                  ? '주소로 위치를 찾는 중…'
-                  : geoState === 'ok'
-                    ? '핀을 옮겨 정확한 위치로 맞춰 주세요'
-                    : draft
-                      ? '지도를 눌러 위치를 옮길 수 있어요'
-                      : '주소를 찾으면 지도에 표시됩니다'}
+                {draft ? '핀을 끌거나 지도를 눌러 위치를 맞춰 주세요' : '장소를 검색하면 지도에 표시됩니다'}
               </span>
-              {draft ? <span className="font-bold text-gold">위치 지정됨</span> : null}
+              {draft ? <span className="font-bold text-gold-deep">위치 지정됨</span> : null}
             </div>
-            <div className="h-44">
-              <MapView
-                draft={draft}
-                center={center}
-                zoom={zoom}
-                onDraftMove={(lat, lng) => {
-                  setDraft({ lat, lng })
-                  setGeoState('ok')
-                }}
-              />
-            </div>
+            <KakaoMap
+              className="h-48 w-full"
+              draft={draft}
+              center={center}
+              level={4}
+              fitSignal={draft ? 'draft' : undefined}
+              onDraftMove={(lat, lng) => setDraft({ lat, lng })}
+              onMapClick={(lat, lng) => setDraft({ lat, lng })}
+            />
           </div>
-          {geoState === 'fail' ? (
-            <p className="mt-1.5 text-[11.5px] leading-snug text-rose">
-              주소의 좌표를 자동으로 찾지 못했어요. 지도를 눌러 가게 위치를 직접 지정해 주세요.
-            </p>
-          ) : null}
         </section>
 
+        {/* 한줄 소개 */}
         <section>
           <label htmlFor="intro" className="label">
-            한줄 소개 <span className="text-ink-mute">(선택)</span>
+            한줄 소개 <span className="font-bold text-ink-mute">(선택)</span>
           </label>
           <textarea
             id="intro"
@@ -310,9 +451,10 @@ export default function AddPage() {
           />
         </section>
 
+        {/* 스티커 사진 */}
         <section>
           <span className="label">
-            교우의 집 스티커 사진 <span className="text-gold">*</span>
+            교우의 집 스티커 사진 <span className="text-rose">*</span>
           </span>
           <input
             ref={photoInput}
@@ -326,9 +468,9 @@ export default function AddPage() {
               <img src={photo.preview} alt="스티커 미리보기" className="h-20 w-20 rounded-xl object-cover" />
               <div className="min-w-0 flex-1">
                 <p className="truncate text-[12.5px] font-bold">{photo.file.name || '사진'}</p>
-                <p className="text-[11.5px] text-ink-mute">업로드 전에 자동으로 줄여요</p>
-                <div className="mt-1 flex gap-2 text-[11.5px] font-bold">
-                  <button type="button" onClick={() => photoInput.current?.click()} className="text-gold">
+                <p className="text-[11px] text-ink-mute">업로드 전에 자동으로 줄여요</p>
+                <div className="mt-1 flex gap-3 text-[11.5px] font-bold">
+                  <button type="button" onClick={() => photoInput.current?.click()} className="text-gold-deep">
                     바꾸기
                   </button>
                   <button
@@ -348,11 +490,11 @@ export default function AddPage() {
             <button
               type="button"
               onClick={() => photoInput.current?.click()}
-              className="flex w-full flex-col items-center gap-1.5 rounded-2xl border border-dashed border-gold-line bg-gold-soft/40 px-4 py-6 text-center"
+              className="flex w-full flex-col items-center gap-1.5 rounded-3xl border border-dashed border-gold-line bg-gold-soft/40 px-4 py-6 text-center"
             >
-              <span className="text-2xl">📷</span>
-              <span className="text-[13px] font-bold text-ink-soft">스티커 사진 찍기 / 앨범에서 고르기</span>
-              <span className="text-[11.5px] leading-snug text-ink-mute">
+              <Icon name="camera" className="h-6 w-6 text-gold-deep" />
+              <span className="text-[13px] font-extrabold text-gold-deep">스티커 사진 찍기 / 앨범에서 고르기</span>
+              <span className="text-[11px] leading-snug text-ink-mute">
                 가게 문에 붙은 ‘교우의 집’ 스티커를 찍어 주세요.
                 <br />
                 확인되면 다른 교우들이 믿고 찾아갈 수 있어요.
@@ -361,14 +503,18 @@ export default function AddPage() {
           )}
         </section>
 
-        {error ? <p className="rounded-2xl bg-rose/5 px-3.5 py-3 text-[12.5px] text-rose">{error}</p> : null}
+        {error ? (
+          <p className="rounded-2xl bg-rose/5 px-3.5 py-3 text-[12.5px] leading-relaxed text-rose">{error}</p>
+        ) : null}
 
-        <button type="button" onClick={submit} disabled={sending} className="btn-primary w-full !py-3.5">
-          {sending ? '등록하는 중…' : `${categoryOf(category).label} · 지도에 등록하기`}
-        </button>
-        <p className="pb-2 text-center text-[11px] leading-relaxed text-ink-mute">
-          등록하면 바로 지도에 보여요. 잘못된 정보는 다른 교우의 신고로 숨겨질 수 있어요.
-        </p>
+        <div className="space-y-2 pb-2">
+          <button type="button" onClick={submit} disabled={sending} className="btn-primary w-full !py-3.5">
+            {sending ? '등록하는 중…' : `${categoryOf(category).label} · 지도에 등록하기`}
+          </button>
+          <p className="text-center text-[11px] leading-relaxed text-ink-mute">
+            등록하면 바로 지도에 보여요. 잘못된 정보는 다른 교우의 신고로 숨겨질 수 있어요.
+          </p>
+        </div>
       </main>
     </div>
   )
