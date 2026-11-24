@@ -3,7 +3,7 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
-  "description": "교우의 집 지도 - 천주교 교우 가게 지도",
+  "description": "천주교 교우의 집 지도 - 천주교 교우 가게 지도",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",

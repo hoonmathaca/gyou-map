@@ -71,7 +71,7 @@ export default function AdminPage() {
       <div className="screen">
         <header className="border-b border-line px-4 pb-3 pt-[max(env(safe-area-inset-top),14px)]">
           <h1 className="text-[17px] font-extrabold">관리자</h1>
-          <p className="text-[12px] text-ink-mute">교우의 집 지도 운영 도구</p>
+          <p className="text-[12px] text-ink-mute">천주교 교우의 집 지도 운영 도구</p>
         </header>
         <main className="flex flex-1 flex-col justify-center px-6 pb-24">
           <div className="card space-y-3 p-5">
@@ -258,7 +258,7 @@ export default function AdminPage() {
               <div key={r.id} className="card p-3">
                 <div className="flex items-center gap-1.5">
                   <span className="text-[12.5px] font-extrabold">{placeName(r.place_id)}</span>
-                  <span className="rounded-full bg-gold-soft px-1.5 py-0.5 text-[10px] font-bold text-gold">
+                  <span className="rounded-full bg-brand-soft px-1.5 py-0.5 text-[10px] font-bold text-brand">
                     {r.reason}
                   </span>
                   <span className="ml-auto text-[10.5px] text-ink-mute">{formatDate(r.created_at)}</span>
@@ -300,7 +300,7 @@ function ActionBtn({
   tone?: 'normal' | 'danger' | 'ok'
 }) {
   const color =
-    tone === 'danger' ? 'text-rose border-rose/30' : tone === 'ok' ? 'text-gold border-gold-line' : 'text-ink-soft border-line'
+    tone === 'danger' ? 'text-rose border-rose/30' : tone === 'ok' ? 'text-brand border-brand-line' : 'text-ink-soft border-line'
   return (
     <button
       type="button"

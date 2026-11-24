@@ -4,18 +4,18 @@ export default {
   theme: {
     extend: {
       colors: {
-        // 깊은 올리브 잉크 — 본문 글자·버튼 바탕
+        // 깊은 남색 잉크 — 본문 글자·버튼 바탕 (훈수학 텍스트 남색 계열)
         ink: {
-          DEFAULT: '#26331F',
-          soft: '#47533D',
-          mute: '#7C8674',
+          DEFAULT: '#16284C',
+          soft: '#41527A',
+          mute: '#78859E',
         },
-        // 주 색 — 스팟맵풍 올리브 그린
-        gold: {
-          DEFAULT: '#6F8B3E',
-          deep: '#5A7231',
-          soft: '#EDF1DF',
-          line: '#CCD8B2',
+        // 주 색 — 훈수학 시그니처 남색·파랑 (선오공: navy #12296B / blue #1D4A9B)
+        brand: {
+          DEFAULT: '#1D4A9B',
+          deep: '#12296B',
+          soft: '#EEF3FD',
+          line: '#C9D8F2',
         },
         paper: {
           DEFAULT: '#FAF8F1',
@@ -39,10 +39,10 @@ export default {
         ],
       },
       boxShadow: {
-        soft: '0 10px 30px -18px rgba(38, 51, 31, 0.5)',
-        card: '0 4px 14px -8px rgba(38, 51, 31, 0.3)',
-        sheet: '0 -10px 30px -18px rgba(38, 51, 31, 0.45)',
-        float: '0 6px 18px -8px rgba(38, 51, 31, 0.45)',
+        soft: '0 10px 30px -18px rgba(18, 41, 107, 0.5)',
+        card: '0 4px 14px -8px rgba(18, 41, 107, 0.3)',
+        sheet: '0 -10px 30px -18px rgba(18, 41, 107, 0.45)',
+        float: '0 6px 18px -8px rgba(18, 41, 107, 0.45)',
       },
       keyframes: {
         fadein: {

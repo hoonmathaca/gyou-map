@@ -43,7 +43,7 @@ const escapeHtml = (value: string) =>
 const DRAFT_PIN =
   "data:image/svg+xml;charset=utf-8," +
   encodeURIComponent(
-    `<svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 36 36"><path d="M18 34.5S31 23 31 14.2A13 13 0 1 0 5 14.2C5 23 18 34.5 18 34.5z" fill="#BF4A33" stroke="#fff" stroke-width="2.6"/><circle cx="18" cy="14" r="4.6" fill="#fff"/></svg>`,
+    `<svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 36 36"><path d="M18 34.5S31 23 31 14.2A13 13 0 1 0 5 14.2C5 23 18 34.5 18 34.5z" fill="#12296B" stroke="#fff" stroke-width="2.6"/><circle cx="18" cy="14" r="4.6" fill="#fff"/></svg>`,
   )
 
 export default function KakaoMap({

@@ -65,19 +65,19 @@
     @apply inline-flex items-center justify-center gap-1.5 rounded-2xl px-4 py-3 text-[15px] font-bold transition active:scale-[0.98] disabled:opacity-50;
   }
   .btn-primary {
-    @apply btn bg-gold text-white shadow-card;
+    @apply btn bg-brand text-white shadow-card;
   }
   .btn-ink {
     @apply btn bg-ink text-paper shadow-card;
   }
   .btn-ghost {
-    @apply btn border border-gold-line bg-white text-gold-deep;
+    @apply btn border border-brand-line bg-white text-brand-deep;
   }
   .field {
-    @apply w-full rounded-2xl border border-line bg-white px-4 py-3 text-[15px] text-ink outline-none placeholder:text-ink-mute/60 focus:border-gold;
+    @apply w-full rounded-2xl border border-line bg-white px-4 py-3 text-[15px] text-ink outline-none placeholder:text-ink-mute/60 focus:border-brand;
   }
   .label {
-    @apply mb-1.5 block text-[12px] font-extrabold tracking-wide text-gold-deep;
+    @apply mb-1.5 block text-[12px] font-extrabold tracking-wide text-brand-deep;
   }
   .card {
     @apply rounded-3xl border border-line bg-white shadow-card;
@@ -86,19 +86,19 @@
     @apply inline-flex items-center gap-1 whitespace-nowrap rounded-full border border-line bg-white px-3.5 py-1.5 text-[12.5px] font-bold text-ink-soft transition;
   }
   .chip-on {
-    @apply border-gold bg-gold text-white;
+    @apply border-brand bg-brand text-white;
   }
   .fab {
-    @apply flex h-11 w-11 items-center justify-center rounded-full border border-line bg-white text-gold-deep shadow-float transition active:scale-95;
+    @apply flex h-11 w-11 items-center justify-center rounded-full border border-line bg-white text-brand-deep shadow-float transition active:scale-95;
   }
   .eyebrow {
-    @apply text-[11px] font-extrabold uppercase tracking-[0.14em] text-gold;
+    @apply text-[11px] font-extrabold uppercase tracking-[0.14em] text-brand;
   }
   /* 카카오맵 컨테이너 — 높이는 화면에서 지정한 유틸리티(h-48 등)가 이긴다 */
   .kakao-map {
     width: 100%;
     height: 100%;
-    background: #eef0e4;
+    background: #edf1f8;
     font-family: inherit;
   }
 }
@@ -123,9 +123,9 @@
   align-items: center;
   justify-content: center;
   border-radius: 999px;
-  background: #6f8b3e;
+  background: #1d4a9b;
   border: 2.5px solid #fff;
-  box-shadow: 0 6px 14px -6px rgba(38, 51, 31, 0.75);
+  box-shadow: 0 6px 14px -6px rgba(18, 41, 107, 0.75);
   transition: transform 0.15s ease, background 0.15s ease;
 }
 .kpin__dot svg {
@@ -146,21 +146,21 @@
   font-weight: 800;
   line-height: 1.25;
   letter-spacing: -0.2px;
-  color: #26331f;
+  color: #16284c;
   text-shadow: 0 0 3px #faf8f1, 0 0 3px #faf8f1, 0 1px 3px #faf8f1, 0 0 6px #faf8f1;
   pointer-events: none;
 }
 .kpin__bap {
   font-weight: 800;
-  color: #4f6a2c;
+  color: #12296b;
 }
 .kpin--on .kpin__dot {
-  background: #c0492b;
+  background: #12296b;
   transform: scale(1.12);
-  box-shadow: 0 8px 16px -6px rgba(38, 51, 31, 0.8);
+  box-shadow: 0 0 0 3px rgba(29, 74, 155, 0.25), 0 8px 16px -6px rgba(18, 41, 107, 0.85);
 }
 .kpin--on .kpin__label {
-  color: #a63b23;
+  color: #12296b;
 }
 .kmap--far .kpin__label {
   display: none;
@@ -176,7 +176,7 @@
   border-radius: 999px;
   background: #2f7bd6;
   border: 3px solid #fff;
-  box-shadow: 0 0 0 6px rgba(47, 123, 214, 0.18), 0 2px 6px rgba(38, 51, 31, 0.35);
+  box-shadow: 0 0 0 6px rgba(47, 123, 214, 0.18), 0 2px 6px rgba(18, 41, 107, 0.35);
 }
 
 /* 등록 화면 핀 */
@@ -185,9 +185,9 @@
   height: 34px;
   border-radius: 999px 999px 999px 6px;
   transform: rotate(-45deg);
-  background: #c0492b;
+  background: #12296b;
   border: 2.5px solid #fff;
-  box-shadow: 0 6px 14px -6px rgba(38, 51, 31, 0.75);
+  box-shadow: 0 6px 14px -6px rgba(18, 41, 107, 0.75);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -201,7 +201,7 @@
 
 /* 신고 모달 등에서 쓰는 딤드 */
 .dim {
-  background: rgba(30, 38, 25, 0.45);
+  background: rgba(18, 41, 107, 0.42);
 }
 
 /* 가로 스크롤 칩 줄 — 스크롤바 숨김 */

@@ -28,7 +28,7 @@ export default function PlaceCard({
             <h3 className="truncate text-[15px] font-extrabold leading-snug">{placeTitle(place)}</h3>
             <p className="mt-0.5 truncate text-[12px] text-ink-mute">{place.address}</p>
           </Link>
-          <span className="shrink-0 rounded-full bg-gold-soft px-2 py-0.5 text-[11px] font-bold text-gold">
+          <span className="shrink-0 rounded-full bg-brand-soft px-2 py-0.5 text-[11px] font-bold text-brand">
             {cat.glyph} {cat.label}
           </span>
         </div>
@@ -58,7 +58,7 @@ export function Sticker({
   return url ? (
     <img
       src={url}
-      alt={`${name} 교우의 집 스티커`}
+      alt={`${name} 천주교 교우의 집 스티커`}
       loading="lazy"
       className={`rounded-2xl border border-line object-cover ${className}`}
     />

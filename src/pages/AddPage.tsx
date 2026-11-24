@@ -195,7 +195,7 @@ export default function AddPage() {
     if (!name.trim()) return setError('가게 이름을 적어 주세요.')
     if (!address.trim()) return setError('주소를 찾아 주세요.')
     if (!draft) return setError('지도에서 가게 위치를 확인해 주세요.')
-    if (!photo) return setError('교우의 집 스티커 사진을 올려 주세요.')
+    if (!photo) return setError('천주교 교우의 집 스티커 사진을 올려 주세요.')
 
     setSending(true)
     try {
@@ -232,7 +232,7 @@ export default function AddPage() {
           <Icon name="back" className="h-4.5 w-4.5" />
         </button>
         <div>
-          <h1 className="text-[15px] font-extrabold leading-tight">교우의 집 등록</h1>
+          <h1 className="text-[15px] font-extrabold leading-tight">천주교 교우의 집 등록</h1>
           <p className="text-[11px] leading-tight text-ink-mute">1분이면 충분해요</p>
         </div>
       </header>
@@ -247,7 +247,7 @@ export default function AddPage() {
               onClick={() => setRegistrant('owner')}
               className={`rounded-2xl border px-3 py-2.5 text-left transition ${
                 registrant === 'owner'
-                  ? 'border-gold bg-gold text-white shadow-card'
+                  ? 'border-brand bg-brand text-white shadow-card'
                   : 'border-line bg-white text-ink'
               }`}
             >
@@ -261,7 +261,7 @@ export default function AddPage() {
               onClick={() => setRegistrant('visitor')}
               className={`rounded-2xl border px-3 py-2.5 text-left transition ${
                 registrant === 'visitor'
-                  ? 'border-gold bg-gold text-white shadow-card'
+                  ? 'border-brand bg-brand text-white shadow-card'
                   : 'border-line bg-white text-ink'
               }`}
             >
@@ -309,7 +309,7 @@ export default function AddPage() {
           <button
             type="button"
             onClick={pickAddress}
-            className="mt-1.5 text-[11.5px] font-bold text-gold-deep underline decoration-gold-line underline-offset-2"
+            className="mt-1.5 text-[11.5px] font-bold text-brand-deep underline decoration-brand-line underline-offset-2"
           >
             주소로 직접 찾기
           </button>
@@ -321,9 +321,9 @@ export default function AddPage() {
                   <button
                     type="button"
                     onClick={() => pickFound(item)}
-                    className="flex w-full items-start gap-2.5 px-3 py-2.5 text-left active:bg-gold-soft/50"
+                    className="flex w-full items-start gap-2.5 px-3 py-2.5 text-left active:bg-brand-soft/50"
                   >
-                    <Icon name="pin" className="mt-0.5 h-4 w-4 shrink-0 text-gold" />
+                    <Icon name="pin" className="mt-0.5 h-4 w-4 shrink-0 text-brand" />
                     <span className="min-w-0 flex-1">
                       <span className="block truncate text-[13px] font-extrabold">{item.name}</span>
                       <span className="mt-0.5 block truncate text-[11.5px] text-ink-mute">{item.address}</span>
@@ -384,7 +384,7 @@ export default function AddPage() {
                 onClick={() => setCategory(c.id)}
                 className={`flex items-center justify-center gap-1 rounded-2xl border px-1.5 py-2.5 text-[12px] font-bold transition ${
                   category === c.id
-                    ? 'border-gold bg-gold text-white'
+                    ? 'border-brand bg-brand text-white'
                     : 'border-line bg-white text-ink-soft'
                 }`}
               >
@@ -421,7 +421,7 @@ export default function AddPage() {
               <span>
                 {draft ? '핀을 끌거나 지도를 눌러 위치를 맞춰 주세요' : '장소를 검색하면 지도에 표시됩니다'}
               </span>
-              {draft ? <span className="font-bold text-gold-deep">위치 지정됨</span> : null}
+              {draft ? <span className="font-bold text-brand-deep">위치 지정됨</span> : null}
             </div>
             <KakaoMap
               className="h-48 w-full"
@@ -453,7 +453,7 @@ export default function AddPage() {
         {/* 스티커 사진 */}
         <section>
           <span className="label">
-            교우의 집 스티커 사진 <span className="text-rose">*</span>
+            천주교 교우의 집 스티커 사진 <span className="text-rose">*</span>
           </span>
           <input
             ref={photoInput}
@@ -469,7 +469,7 @@ export default function AddPage() {
                 <p className="truncate text-[12.5px] font-bold">{photo.file.name || '사진'}</p>
                 <p className="text-[11px] text-ink-mute">업로드 전에 자동으로 줄여요</p>
                 <div className="mt-1 flex gap-3 text-[11.5px] font-bold">
-                  <button type="button" onClick={() => photoInput.current?.click()} className="text-gold-deep">
+                  <button type="button" onClick={() => photoInput.current?.click()} className="text-brand-deep">
                     바꾸기
                   </button>
                   <button
@@ -489,12 +489,12 @@ export default function AddPage() {
             <button
               type="button"
               onClick={() => photoInput.current?.click()}
-              className="flex w-full flex-col items-center gap-1.5 rounded-3xl border border-dashed border-gold-line bg-gold-soft/40 px-4 py-6 text-center"
+              className="flex w-full flex-col items-center gap-1.5 rounded-3xl border border-dashed border-brand-line bg-brand-soft/40 px-4 py-6 text-center"
             >
-              <Icon name="camera" className="h-6 w-6 text-gold-deep" />
-              <span className="text-[13px] font-extrabold text-gold-deep">스티커 사진 찍기 / 앨범에서 고르기</span>
-              <span className="text-[11px] leading-snug text-ink-mute">
-                가게 문에 붙은 ‘교우의 집’ 스티커를 찍어 주세요.
+              <Icon name="camera" className="h-6 w-6 text-brand-deep" />
+              <span className="text-[13px] font-extrabold text-brand-deep">스티커 사진 찍기 / 앨범에서 고르기</span>
+              <span className="text-[11px] break-keep leading-snug text-ink-mute">
+                가게 문에 붙은 ‘천주교 교우의 집’ 스티커를 찍어 주세요.
                 <br />
                 확인되면 다른 교우들이 믿고 찾아갈 수 있어요.
               </span>

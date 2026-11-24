@@ -154,7 +154,7 @@ export default function MapPage() {
       {/* ── 상단: 검색 + 업종 ─────────────────────────── */}
       <header className="z-30 shrink-0 border-b border-line/70 bg-paper/95 px-3 pb-2 pt-[max(env(safe-area-inset-top),10px)] backdrop-blur">
         <div className="flex items-center gap-2">
-          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gold text-white">
+          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-brand text-white">
             <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={1.9} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
               <path d="M12 2.8 4.6 8.4v11.2a1.2 1.2 0 0 0 1.2 1.2h12.4a1.2 1.2 0 0 0 1.2-1.2V8.4z" />
               <path d="M12 8.2v6M9 11.2h6" />
@@ -162,7 +162,7 @@ export default function MapPage() {
           </span>
           <div className="min-w-0 flex-1">
             <h1 className="text-[15.5px] font-extrabold leading-tight tracking-tight text-ink">
-              교우의 집 지도
+              천주교 교우의 집 지도
             </h1>
             <p className="text-[11px] leading-tight text-ink-mute">
               {total > 0 ? `교우가 운영하는 가게 ${total}곳` : '교우가 운영하는 가게를 모읍니다'}
@@ -187,7 +187,7 @@ export default function MapPage() {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="가게이름 · 세례명 · 지역 검색"
-            className="h-10 w-full rounded-full border border-line bg-white pl-10 pr-9 text-[13.5px] text-ink outline-none placeholder:text-ink-mute/70 focus:border-gold"
+            className="h-10 w-full rounded-full border border-line bg-white pl-10 pr-9 text-[13.5px] text-ink outline-none placeholder:text-ink-mute/70 focus:border-brand"
             aria-label="가게 검색"
           />
           {query ? (
@@ -281,11 +281,9 @@ export default function MapPage() {
           {!loading && total === 0 ? (
             <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center px-8">
               <div className="pointer-events-auto w-full rounded-3xl border border-line bg-white/95 p-5 text-center shadow-soft">
-                <p className="text-[14px] font-extrabold">아직 등록된 교우의 집이 없어요</p>
-                <p className="mt-1.5 text-[12px] leading-relaxed text-ink-mute">
-                  가게 문에 붙은 ‘교우의 집’ 스티커를 확인하고
-                  <br />
-                  첫 번째 가게를 등록해 주세요.
+                <p className="text-[14px] font-extrabold">아직 등록된 천주교 교우의 집이 없어요</p>
+                <p className="mt-1.5 break-keep text-[12px] leading-relaxed text-ink-mute">
+                  가게 문에 붙은 ‘천주교 교우의 집’ 스티커를 확인하고 첫 번째 가게를 등록해 주세요.
                 </p>
                 <Link to="/add" className="btn-primary mt-3 w-full !py-2.5 !text-[13.5px]">
                   가게 등록하기
@@ -307,20 +305,20 @@ export default function MapPage() {
                 <div className="mx-auto mb-2 h-1 w-9 rounded-full bg-line" />
                 <div className="flex items-start gap-3">
                   <div className="min-w-0 flex-1">
-                    <p className="text-[10.5px] font-extrabold uppercase tracking-[0.14em] text-gold">
+                    <p className="text-[10.5px] font-extrabold uppercase tracking-[0.14em] text-brand">
                       {categoryOf(selected.category).label}
                     </p>
                     <h2 className="mt-1 truncate text-[19px] font-extrabold leading-tight text-ink">
                       {selected.name}
                       {selected.baptismal_name ? (
-                        <span className="ml-1 text-[14px] font-bold text-gold-deep">
+                        <span className="ml-1 text-[14px] font-bold text-brand-deep">
                           ({selected.baptismal_name})
                         </span>
                       ) : null}
                     </h2>
                     <p className="mt-1 flex flex-wrap items-center gap-x-1.5 text-[12px] text-ink-soft">
                       {selectedMeters !== null ? (
-                        <span className="font-extrabold text-gold-deep">{formatDistance(selectedMeters)}</span>
+                        <span className="font-extrabold text-brand-deep">{formatDistance(selectedMeters)}</span>
                       ) : null}
                       {selectedMeters !== null ? <span className="text-ink-mute">·</span> : null}
                       <span className="truncate">{shortAddress(selected.address)}</span>
@@ -383,7 +381,7 @@ export default function MapPage() {
             <p className="text-[12px] font-bold text-ink-mute">
               {filtered.length}곳{self ? ' · 가까운 순' : ' · 최신순'}
             </p>
-            <button type="button" onClick={() => setTab('map')} className="text-[12px] font-bold text-gold-deep">
+            <button type="button" onClick={() => setTab('map')} className="text-[12px] font-bold text-brand-deep">
               지도로 보기 ›
             </button>
           </div>
@@ -401,7 +399,7 @@ export default function MapPage() {
             <ul className="divide-y divide-line/80">
               {withDistance.map(({ place, meters }) => (
                 <li key={place.id}>
-                  <Link to={`/p/${place.id}`} className="flex items-center gap-3 px-4 py-3 active:bg-gold-soft/40">
+                  <Link to={`/p/${place.id}`} className="flex items-center gap-3 px-4 py-3 active:bg-brand-soft/40">
                     <Sticker
                       url={place.sticker_url}
                       name={place.name}
@@ -411,14 +409,14 @@ export default function MapPage() {
                       <h3 className="truncate text-[15px] font-extrabold leading-snug text-ink">
                         {place.name}
                         {place.baptismal_name ? (
-                          <span className="ml-1 text-[12px] font-bold text-gold-deep">
+                          <span className="ml-1 text-[12px] font-bold text-brand-deep">
                             ({place.baptismal_name})
                           </span>
                         ) : null}
                       </h3>
                       <p className="mt-0.5 truncate text-[12px] text-ink-mute">{place.address}</p>
                       <p className="mt-1 flex items-center gap-1.5 text-[11.5px] text-ink-mute">
-                        <span className="font-bold text-gold-deep">{categoryOf(place.category).label}</span>
+                        <span className="font-bold text-brand-deep">{categoryOf(place.category).label}</span>
                         <span>·</span>
                         <span>리뷰 {stats.get(place.id)?.count ?? 0}</span>
                         {place.registrant_type === 'owner' ? (
@@ -430,7 +428,7 @@ export default function MapPage() {
                       </p>
                     </div>
                     {meters !== null ? (
-                      <span className="shrink-0 text-[12px] font-extrabold text-gold-deep">
+                      <span className="shrink-0 text-[12px] font-extrabold text-brand-deep">
                         {formatDistance(meters)}
                       </span>
                     ) : (

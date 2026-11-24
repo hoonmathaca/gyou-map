@@ -159,7 +159,7 @@ export default function PlacePage() {
       <TopBar title={place.name} />
 
       {justAdded ? (
-        <div className="mx-4 mt-2.5 flex items-center gap-2 rounded-2xl border border-gold-line bg-gold-soft px-3.5 py-2.5 text-[12.5px] font-bold text-gold-deep">
+        <div className="mx-4 mt-2.5 flex items-center gap-2 rounded-2xl border border-brand-line bg-brand-soft px-3.5 py-2.5 text-[12.5px] font-bold text-brand-deep">
           <Icon name="check" className="h-4 w-4" />
           <span className="flex-1">등록 완료! 지도에 바로 표시됩니다.</span>
           <button type="button" aria-label="알림 닫기" onClick={() => setJustAdded(false)}>
@@ -172,7 +172,7 @@ export default function PlacePage() {
         {/* ── 이름·주소 ─────────────────────────────── */}
         <section className="px-4 pt-4">
           <div className="flex items-center gap-2">
-            <span className="inline-flex items-center gap-1 rounded-full bg-gold-soft px-2.5 py-1 text-[11px] font-extrabold text-gold-deep">
+            <span className="inline-flex items-center gap-1 rounded-full bg-brand-soft px-2.5 py-1 text-[11px] font-extrabold text-brand-deep">
               <CatIcon id={place.category} className="h-3.5 w-3.5" />
               {cat.label}
             </span>
@@ -184,7 +184,7 @@ export default function PlacePage() {
           <h1 className="mt-2.5 text-[23px] font-extrabold leading-tight tracking-tight text-ink">
             {place.name}
             {place.baptismal_name ? (
-              <span className="ml-1.5 text-[16px] font-bold text-gold-deep">({place.baptismal_name})</span>
+              <span className="ml-1.5 text-[16px] font-bold text-brand-deep">({place.baptismal_name})</span>
             ) : null}
           </h1>
 
@@ -239,7 +239,7 @@ export default function PlacePage() {
               href={directionsUrl(placeTitle(place), place.lat, place.lng)}
               target="_blank"
               rel="noreferrer"
-              className="absolute left-2.5 top-2.5 z-20 flex items-center gap-1.5 rounded-full border border-line bg-white/95 px-3 py-1.5 text-[12px] font-extrabold text-gold-deep shadow-card"
+              className="absolute left-2.5 top-2.5 z-20 flex items-center gap-1.5 rounded-full border border-line bg-white/95 px-3 py-1.5 text-[12px] font-extrabold text-brand-deep shadow-card"
             >
               길찾기
               <Icon name="arrow" className="h-3.5 w-3.5" />
@@ -256,11 +256,11 @@ export default function PlacePage() {
           </div>
         </section>
 
-        {/* ── 교우의 집 스티커 ─────────────────────── */}
+        {/* ── 천주교 교우의 집 스티커 ─────────────────────── */}
         <section className="mt-4 px-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-[13px] font-extrabold text-ink">교우의 집 스티커</h2>
-            <button type="button" onClick={() => setPhotoOpen(true)} className="text-[11.5px] font-bold text-gold-deep">
+            <h2 className="text-[13px] font-extrabold text-ink">천주교 교우의 집 스티커</h2>
+            <button type="button" onClick={() => setPhotoOpen(true)} className="text-[11.5px] font-bold text-brand-deep">
               크게 보기 ›
             </button>
           </div>
@@ -277,12 +277,12 @@ export default function PlacePage() {
         <section className="mt-5 px-4">
           <div className="flex items-center justify-between">
             <h2 className="text-[15px] font-extrabold text-ink">
-              교우 리뷰 <span className="text-gold">{reviews.length}</span>
+              교우 리뷰 <span className="text-brand">{reviews.length}</span>
             </h2>
             <button
               type="button"
               onClick={() => setReviewOpen((v) => !v)}
-              className="rounded-full border border-gold-line bg-white px-3 py-1.5 text-[12px] font-extrabold text-gold-deep"
+              className="rounded-full border border-brand-line bg-white px-3 py-1.5 text-[12px] font-extrabold text-brand-deep"
             >
               {reviewOpen ? '닫기' : '리뷰 쓰기'}
             </button>
@@ -376,12 +376,12 @@ export default function PlacePage() {
           <div className="flex flex-1 items-center justify-center">
             <img
               src={place.sticker_url}
-              alt={`${place.name} 교우의 집 스티커`}
+              alt={`${place.name} 천주교 교우의 집 스티커`}
               className="max-h-full max-w-full rounded-2xl object-contain"
             />
           </div>
           <p className="mt-3 text-center text-[12px] text-paper/80">
-            {placeTitle(place)} · 교우의 집 스티커
+            {placeTitle(place)} · 천주교 교우의 집 스티커
           </p>
         </div>
       ) : null}
@@ -409,7 +409,7 @@ export default function PlacePage() {
             ) : (
               <>
                 <h2 className="text-[16px] font-extrabold">사실과 달라요</h2>
-                <p className="mt-1 text-[12.5px] leading-relaxed text-ink-mute">
+                <p className="mt-1 break-keep text-[12.5px] leading-relaxed text-ink-mute">
                   다른 교우들이 헛걸음하지 않도록 알려 주세요. 서로 다른 교우 3명이 신고하면 자동으로 숨겨져요.
                 </p>
                 <div className="mt-3 space-y-1.5">
@@ -417,7 +417,7 @@ export default function PlacePage() {
                     <label
                       key={reason}
                       className={`flex cursor-pointer items-center gap-2.5 rounded-2xl border px-3.5 py-3 text-[13.5px] ${
-                        reportReason === reason ? 'border-gold bg-gold-soft/70' : 'border-line bg-white'
+                        reportReason === reason ? 'border-brand bg-brand-soft/70' : 'border-line bg-white'
                       }`}
                     >
                       <input
@@ -426,7 +426,7 @@ export default function PlacePage() {
                         value={reason}
                         checked={reportReason === reason}
                         onChange={() => setReportReason(reason)}
-                        className="accent-gold"
+                        className="accent-brand"
                       />
                       {reason}
                     </label>
@@ -475,7 +475,7 @@ function TopBar({ title }: { title?: string }) {
       >
         <Icon name="back" className="h-4.5 w-4.5" />
       </button>
-      <span className="truncate text-[13.5px] font-extrabold">{title ?? '교우의 집'}</span>
+      <span className="truncate text-[13.5px] font-extrabold">{title ?? '천주교 교우의 집'}</span>
       <Link to="/" className="ml-auto text-[12px] font-bold text-ink-mute">
         지도
       </Link>
