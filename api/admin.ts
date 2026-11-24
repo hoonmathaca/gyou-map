@@ -11,7 +11,8 @@
  *
  *  필요한 Vercel 환경변수
  *    DATABASE_URL        postgres://postgres.<ref>:<비밀번호>@aws-1-ap-northeast-2.pooler.supabase.com:5432/postgres
- *    VITE_ADMIN_PASSWORD 관리자 비밀번호 (없으면 ADMIN_PASSWORD, 그래도 없으면 0801)
+ *    ADMIN_PASSWORD      관리자 비밀번호 (Vercel 'Secret' 타입, 기본 0801)
+ *                        (VITE_ADMIN_PASSWORD 로 넣어도 인식한다)
  *    ADMIN_TOKEN_SECRET  (선택) 세션 토큰 서명 키
  */
 import crypto from 'node:crypto'
@@ -19,7 +20,7 @@ import { Pool } from 'pg'
 
 declare const process: { env: Record<string, string | undefined> }
 
-const ADMIN_PASSWORD = process.env.VITE_ADMIN_PASSWORD ?? process.env.ADMIN_PASSWORD ?? '0801'
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD ?? process.env.VITE_ADMIN_PASSWORD ?? '0801'
 const TOKEN_SECRET =
   process.env.ADMIN_TOKEN_SECRET ?? crypto.createHash('sha256').update(`gyou-map|${ADMIN_PASSWORD}`).digest('hex')
 const TOKEN_TTL_MS = 12 * 60 * 60 * 1000

@@ -51,7 +51,7 @@ supabase/schema.sql          테이블·RLS·RPC·Storage 버킷
 | --- | --- | --- |
 | `VITE_SUPABASE_URL` | `https://viagypcoagausmwdlijd.supabase.co` | 브라우저 OK |
 | `VITE_SUPABASE_ANON_KEY` | publishable 키 | 브라우저 OK |
-| `VITE_ADMIN_PASSWORD` | 관리자 비밀번호(기본 `0801`) | **서버만** (앱 번들에 들어가지 않음) |
+| `ADMIN_PASSWORD` | 관리자 비밀번호(기본 `0801`) — Vercel 'Secret' 타입 | **서버만** (앱 번들에 들어가지 않음) |
 | `DATABASE_URL` | `postgres://postgres.<ref>:<DB비밀번호>@aws-1-ap-northeast-2.pooler.supabase.com:5432/postgres` | **서버만** |
 | `ADMIN_TOKEN_SECRET` | (선택) 세션 토큰 서명 키 | **서버만** |
 
@@ -75,5 +75,6 @@ npm run build    # 타입체크 + 배포 빌드
 
 ## 관리자 비밀번호 바꾸기
 
-Vercel 환경변수 `VITE_ADMIN_PASSWORD` 를 바꾸고 재배포하면 됩니다.
+Vercel 환경변수 `ADMIN_PASSWORD`(Secret) 를 바꾸고 재배포하면 됩니다.
+(`VITE_ADMIN_PASSWORD` 로 넣어도 서버 함수가 같은 값으로 읽습니다.)
 (비밀번호는 서버에서만 쓰이므로 DB에는 저장되지 않습니다.)
