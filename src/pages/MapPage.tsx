@@ -176,12 +176,14 @@ export default function MapPage() {
             </div>
           ) : null}
 
-          <Link
-            to="/add"
-            className="absolute bottom-5 right-4 z-[500] flex items-center gap-1.5 rounded-full bg-gold px-4 py-3 text-[14px] font-extrabold text-white shadow-soft"
-          >
-            <span className="text-[16px] leading-none">＋</span> 가게 등록
-          </Link>
+          {!selected ? (
+            <Link
+              to="/add"
+              className="absolute bottom-5 right-4 z-[500] flex items-center gap-1.5 rounded-full bg-gold px-4 py-3 text-[14px] font-extrabold text-white shadow-soft"
+            >
+              <span className="text-[16px] leading-none">＋</span> 가게 등록
+            </Link>
+          ) : null}
 
           {selected ? (
             <div className="absolute inset-x-0 bottom-0 z-[450] animate-slideup border-t border-line bg-paper px-4 pb-[calc(env(safe-area-inset-bottom)+16px)] pt-3">
