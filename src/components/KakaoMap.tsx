@@ -87,6 +87,8 @@ export default function KakaoMap({
         const options: Record<string, unknown> = {
           center: new maps.LatLng(start.lat, start.lng),
           level: level ?? (center ? 4 : 9),
+          mapTypeControl: false,
+          zoomControl: false,
         }
         if (!interactive) {
           Object.assign(options, {

@@ -165,7 +165,7 @@ export default function MapPage() {
               교우의 집 지도
             </h1>
             <p className="text-[11px] leading-tight text-ink-mute">
-              교우가 운영하는 가게 {total > 0 ? `${total}곳` : '을 모읍니다'}
+              {total > 0 ? `교우가 운영하는 가게 ${total}곳` : '교우가 운영하는 가게를 모읍니다'}
             </p>
           </div>
           <button
