@@ -7,8 +7,8 @@ import { geocodeAddress } from '../lib/geocode'
 import { shrinkImage } from '../lib/image'
 import type { RegistrantType } from '../lib/types'
 
-/** 다음 우편번호 서비스 — 키 없이 쓰는 주소검색 */
-const DAUM_SCRIPT = 'https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js'
+/** 다음 우편번호 서비스 — 키 없이 쓰는 주소검색 (2026-11-30 t1.daumcdn.net 종료로 kakaocdn 사용) */
+const DAUM_SCRIPT = 'https://t1.kakaocdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js'
 
 interface DaumResult {
   roadAddress: string

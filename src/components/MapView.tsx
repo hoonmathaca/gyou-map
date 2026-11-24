@@ -34,11 +34,10 @@ const DEFAULT_CENTER: [number, number] = [37.5665, 126.978] // 서울시청
 const DEFAULT_ZOOM = 11
 
 function pinIcon(active: boolean, glyph?: string) {
-  const cls = `gyou-pin__inner ${active ? 'gyou-pin--on__inner' : ''}`
   const inner = glyph ? `<span class="gyou-pin__glyph">${glyph}</span>` : HOUSE_SVG
   return L.divIcon({
     className: `gyou-pin${active ? ' gyou-pin--on' : ''}`,
-    html: `<div class="${cls}">${inner}</div>`,
+    html: `<div class="gyou-pin__inner">${inner}</div>`,
     iconSize: [38, 38],
     iconAnchor: [19, 36],
   })
