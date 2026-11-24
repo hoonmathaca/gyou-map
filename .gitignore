@@ -9,3 +9,11 @@ dist-ssr
 .vercel
 *.tsbuildinfo
 .env*
+
+# 로컬 검증 스크립트
+.e2e*.py
+.admin_e2e.py
+.shot.py
+.search_e2e.py
+.probe.py
+.vlogin.log

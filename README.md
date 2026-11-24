@@ -3,6 +3,8 @@
 천주교 교우가 운영하는 가게를 지도에서 찾는 웹앱입니다.
 가게 문에 붙은 **‘교우의 집’ 스티커 사진**으로 믿고 찾아갈 수 있게 했습니다.
 
+- 배포: **https://gyou-map.vercel.app** (관리자 https://gyou-map.vercel.app/admin)
+- 저장소: https://github.com/hoonmathaca/gyou-map
 - 지도: Leaflet + OpenStreetMap (**API 키 없이 바로 열립니다**)
 - 주소: 다음 우편번호 서비스(`postcode.map.daum.net`, 키 불필요) + OpenStreetMap 좌표 변환
 - 저장: Supabase (Postgres · Storage) / 배포: Vercel 무료 플랜
@@ -25,6 +27,8 @@
 - **관리자 복구**: 복구하면 신고 내역을 비우고 다시 노출합니다.
 - **사진**: 업로드 전에 긴 변 1200px·JPEG 0.82 로 브라우저에서 줄여 올립니다
   (`src/lib/image.ts`). Storage 버킷 `stickers` 는 공개 읽기, 익명 업로드 허용(5MB 제한).
+- **삭제**: 관리자가 가게를 지우면 DB 행(가게·리뷰·신고)은 바로 사라집니다. 사진 파일은
+  Storage 에 남으므로(직접 삭제는 Storage API 전용) 필요하면 대시보드 Storage 에서 정리합니다.
 
 ## 구조
 

@@ -130,6 +130,6 @@ drop policy if exists stickers_public_upload on storage.objects;
 create policy stickers_public_upload on storage.objects
   for insert to anon, authenticated with check (bucket_id = 'stickers');
 
+-- 공개 버킷은 정책 없이도 /object/public/... 로 읽힌다.
+-- select 정책을 주면 누구나 버킷 파일 목록을 볼 수 있으므로 두지 않는다.
 drop policy if exists stickers_public_read on storage.objects;
-create policy stickers_public_read on storage.objects
-  for select to anon, authenticated using (bucket_id = 'stickers');

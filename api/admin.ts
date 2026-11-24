@@ -24,7 +24,6 @@ const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD ?? process.env.VITE_ADMIN_PASS
 const TOKEN_SECRET =
   process.env.ADMIN_TOKEN_SECRET ?? crypto.createHash('sha256').update(`gyou-map|${ADMIN_PASSWORD}`).digest('hex')
 const TOKEN_TTL_MS = 12 * 60 * 60 * 1000
-const BUCKET = 'stickers'
 
 interface ApiRequest {
   method?: string
@@ -195,13 +194,7 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
         await db().query('delete from public.reports where place_id = $1', [id])
         break
       case 'place.delete': {
-        const found = await db().query<{ sticker_url: string }>(
-          'select sticker_url from public.places where id = $1',
-          [id],
-        )
-        const url = found.rows[0]?.sticker_url
         await db().query('delete from public.places where id = $1', [id])
-        if (url) await deleteSticker(url)
         break
       }
       case 'review.hide':
@@ -235,16 +228,10 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
   }
 }
 
-/** 스티커 사진의 storage.objects 행을 지운다 (공개 URL 도 함께 막힌다) */
-async function deleteSticker(publicUrl: string) {
-  const marker = `/object/public/${BUCKET}/`
-  const i = publicUrl.indexOf(marker)
-  if (i < 0) return
-  const name = decodeURIComponent(publicUrl.slice(i + marker.length))
-  await db()
-    .query('delete from storage.objects where bucket_id = $1 and name = $2', [BUCKET, name])
-    .catch(() => undefined)
-}
+/**
+ * 스티커 사진 파일은 Supabase Storage 에 남는다 (직접 삭제는 Storage API 전용이라
+ * 서버에서 service_role 없이 지울 수 없다). 필요하면 대시보드 Storage 에서 정리한다.
+ */
 
 function safeParse(text: string): Record<string, unknown> | null {
   try {
