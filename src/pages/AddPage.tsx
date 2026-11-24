@@ -389,7 +389,7 @@ export default function AddPage() {
                 }`}
               >
                 <CatIcon id={c.id} className="h-3.5 w-3.5 shrink-0" />
-                <span className="truncate">{c.label}</span>
+                <span className="truncate">{c.short}</span>
               </button>
             ))}
           </div>
