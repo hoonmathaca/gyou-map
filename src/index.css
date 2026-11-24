@@ -1,0 +1,142 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* 나눔스퀘어 라운드(NanumSquareRound) — OFL 1.1, public/fonts 에 함께 배포 */
+@font-face {
+  font-family: 'NanumSquareRound';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/NanumSquareRoundR.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'NanumSquareRound';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('/fonts/NanumSquareRoundB.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'NanumSquareRound';
+  font-style: normal;
+  font-weight: 800;
+  font-display: swap;
+  src: url('/fonts/NanumSquareRoundEB.woff2') format('woff2');
+}
+
+@layer base {
+  :root {
+    color-scheme: light;
+  }
+  html {
+    font-family: 'NanumSquareRound', -apple-system, BlinkMacSystemFont, system-ui, Roboto,
+      'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif;
+  }
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+  body {
+    @apply bg-paper text-ink antialiased;
+    -webkit-tap-highlight-color: transparent;
+    overscroll-behavior-y: none;
+  }
+  button,
+  input,
+  textarea,
+  select {
+    font-family: inherit;
+  }
+  .screen {
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    overflow-x: hidden;
+  }
+  .safe-bottom {
+    padding-bottom: max(env(safe-area-inset-bottom), 12px);
+  }
+}
+
+@layer components {
+  .btn {
+    @apply inline-flex items-center justify-center gap-1.5 rounded-2xl px-4 py-3 text-[15px] font-bold transition active:scale-[0.98] disabled:opacity-50;
+  }
+  .btn-primary {
+    @apply btn bg-ink text-paper shadow-card;
+  }
+  .btn-gold {
+    @apply btn bg-gold text-white shadow-card;
+  }
+  .btn-ghost {
+    @apply btn border border-line bg-white text-ink;
+  }
+  .field {
+    @apply w-full rounded-2xl border border-line bg-white px-4 py-3 text-[15px] text-ink outline-none placeholder:text-ink-mute/60 focus:border-gold;
+  }
+  .label {
+    @apply mb-1.5 block text-[13px] font-bold text-ink-soft;
+  }
+  .card {
+    @apply rounded-3xl border border-line bg-white shadow-card;
+  }
+  .chip {
+    @apply whitespace-nowrap rounded-full border border-line bg-white px-3.5 py-1.5 text-[13px] font-bold text-ink-soft transition;
+  }
+  .chip-on {
+    @apply border-ink bg-ink text-paper;
+  }
+}
+
+/* ── Leaflet ─────────────────────────────────────────────── */
+.leaflet-container {
+  font-family: inherit;
+  background: #ece7dd;
+}
+.leaflet-control-attribution {
+  font-size: 9px !important;
+  background: rgba(255, 255, 255, 0.7) !important;
+}
+.leaflet-bar {
+  border: 1px solid #e7dfd1 !important;
+  box-shadow: 0 2px 8px -4px rgba(28, 37, 65, 0.3) !important;
+}
+.leaflet-bar a {
+  color: #1c2541 !important;
+}
+/* 교우의 집 마커 (divIcon) */
+.gyou-pin {
+  background: transparent;
+  border: none;
+}
+.gyou-pin__inner {
+  width: 38px;
+  height: 38px;
+  border-radius: 14px 14px 14px 4px;
+  background: #1c2541;
+  border: 2.5px solid #faf7f1;
+  box-shadow: 0 5px 14px -6px rgba(28, 37, 65, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: rotate(-45deg);
+}
+.gyou-pin__glyph {
+  transform: rotate(45deg);
+  font-size: 17px;
+  line-height: 1;
+}
+.gyou-pin--on .gyou-pin__inner {
+  background: #b9962f;
+  border-color: #fff8e6;
+  transform: rotate(-45deg) scale(1.12);
+}
+.gyou-pin--draft .gyou-pin__inner {
+  background: #b4513e;
+}
+/* 신고 모달 등에서 쓰는 딤드 */
+.dim {
+  background: rgba(20, 26, 45, 0.45);
+}
