@@ -186,7 +186,7 @@ export default function MapPage() {
           ) : null}
 
           {selected ? (
-            <div className="absolute inset-x-0 bottom-0 z-[450] animate-slideup border-t border-line bg-paper px-4 pb-[calc(env(safe-area-inset-bottom)+16px)] pt-3">
+            <div className="absolute inset-x-0 bottom-0 z-[450] animate-slideup border-t border-line bg-paper px-4 pb-[calc(env(safe-area-inset-bottom)+26px)] pt-3">
               <button
                 type="button"
                 onClick={() => setSelectedId(null)}

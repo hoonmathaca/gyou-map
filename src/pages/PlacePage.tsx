@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Link, useNavigate, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import StarRating from '../components/StarRating'
 import { Sticker, placeTitle } from '../components/PlaceCard'
 import { REPORT_REASONS, categoryOf } from '../lib/categories'
@@ -10,6 +10,8 @@ import { deviceKey, rememberNickname, savedNickname } from '../lib/deviceKey'
 export default function PlacePage() {
   const { id = '' } = useParams()
   const navigate = useNavigate()
+  const [params] = useSearchParams()
+  const [justAdded, setJustAdded] = useState(params.get('new') === '1')
   const [place, setPlace] = useState<Place | null>(null)
   const [reviews, setReviews] = useState<Review[]>([])
   const [loading, setLoading] = useState(true)
@@ -143,6 +145,16 @@ export default function PlacePage() {
   return (
     <div className="screen pb-28">
       <TopBar />
+
+      {justAdded ? (
+        <div className="mx-4 mt-2.5 flex items-center gap-2 rounded-2xl border border-gold-line bg-gold-soft px-3.5 py-2.5 text-[12.5px] font-bold text-ink">
+          <span aria-hidden>🎉</span>
+          <span className="flex-1">등록 완료! 지도에 바로 표시됩니다.</span>
+          <button type="button" aria-label="알림 닫기" onClick={() => setJustAdded(false)} className="text-ink-mute">
+            ✕
+          </button>
+        </div>
+      ) : null}
 
       <main className="flex-1">
         <div className="bg-paper-deep px-4 pb-4 pt-3">
