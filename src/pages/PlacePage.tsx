@@ -239,7 +239,7 @@ export default function PlacePage() {
               href={directionsUrl(placeTitle(place), place.lat, place.lng)}
               target="_blank"
               rel="noreferrer"
-              className="absolute left-2.5 top-2.5 flex items-center gap-1.5 rounded-full border border-line bg-white/95 px-3 py-1.5 text-[12px] font-extrabold text-gold-deep shadow-card"
+              className="absolute left-2.5 top-2.5 z-20 flex items-center gap-1.5 rounded-full border border-line bg-white/95 px-3 py-1.5 text-[12px] font-extrabold text-gold-deep shadow-card"
             >
               길찾기
               <Icon name="arrow" className="h-3.5 w-3.5" />
@@ -249,7 +249,7 @@ export default function PlacePage() {
               target="_blank"
               rel="noreferrer"
               aria-label="카카오맵에서 크게 보기"
-              className="absolute right-2.5 top-2.5 flex h-8 w-8 items-center justify-center rounded-full border border-line bg-white/95 text-ink-soft shadow-card"
+              className="absolute right-2.5 top-2.5 z-20 flex h-8 w-8 items-center justify-center rounded-full border border-line bg-white/95 text-ink-soft shadow-card"
             >
               <Icon name="arrow" className="h-4 w-4" />
             </a>
