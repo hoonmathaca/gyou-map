@@ -84,17 +84,19 @@ export default function KakaoMap({
         if (!alive || !boxRef.current || mapRef.current) return
         const maps = window.kakao.maps
         const start = center ?? pointsRef.current[0] ?? { lat: 37.5665, lng: 126.978 }
-        const map = new maps.Map(boxRef.current, {
+        const options: Record<string, unknown> = {
           center: new maps.LatLng(start.lat, start.lng),
           level: level ?? (center ? 4 : 9),
-        })
-        map.setOptions({
-          draggable: interactive,
-          scrollwheel: interactive,
-          disableDoubleClick: !interactive,
-          disableDoubleClickZoom: !interactive,
-          keyboardShortcuts: interactive,
-        })
+        }
+        if (!interactive) {
+          Object.assign(options, {
+            draggable: false,
+            scrollwheel: false,
+            disableDoubleClickZoom: true,
+            keyboardShortcuts: false,
+          })
+        }
+        const map = new maps.Map(boxRef.current, options)
         maps.event.addListener(map, 'click', (e: any) =>
           cb.current.onMapClick?.(e.latLng.getLat(), e.latLng.getLng()),
         )

@@ -428,7 +428,6 @@ export default function AddPage() {
               draft={draft}
               center={center}
               level={4}
-              fitSignal={draft ? 'draft' : undefined}
               onDraftMove={(lat, lng) => setDraft({ lat, lng })}
               onMapClick={(lat, lng) => setDraft({ lat, lng })}
             />
